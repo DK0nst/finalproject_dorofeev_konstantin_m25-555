@@ -92,6 +92,7 @@ class User:
     def hashed_password(self, value: str):
         if not isinstance(value, str):
             raise TypeError("hashed_password должен быть строкой")
+        
         # SHA256 хеш всегда 64 символа в hex
         if len(value) != 64:
             raise ValueError("Хешированный пароль должен быть 64 символа (SHA256)")
@@ -113,10 +114,10 @@ class User:
     def get_user_info(self) -> dict:
         """Выводит информацию о пользователе (без пароля)."""
         return {
-            "user_id": self._user_id,
-            "username": self._username,
-            "salt": self._salt,
-            "registration_date": self._registration_date.isoformat()
+            "user_id": self.user_id,
+            "username": self.username,
+            "salt": self.salt,
+            "registration_date": self.registration_date.isoformat()
         }
     
     def change_password(self, new_password: str):
@@ -125,13 +126,13 @@ class User:
             raise ValueError("Пароль должен быть не короче 4 символов")
         
         # Односторонний псевдо-хеш
-        salted_password = new_password + self._salt
-        self._hashed_password = hashlib.sha256(salted_password.encode()).hexdigest()
+        salted_password = new_password + self.salt
+        self.hashed_password = hashlib.sha256(salted_password.encode()).hexdigest()
     
     def verify_password(self, password: str) -> bool:
         """Проверяет введённый пароль на совпадение."""
-        salted_password = password + self._salt
-        return self._hashed_password == hashlib.sha256(salted_password.encode()).hexdigest()
+        salted_password = password + self.salt
+        return self.hashed_password == hashlib.sha256(salted_password.encode()).hexdigest()
     
     # Статические методы для создания пользователя
     @staticmethod
