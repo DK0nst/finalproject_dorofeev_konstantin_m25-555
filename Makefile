@@ -15,3 +15,6 @@ package-install:
 
 lint:
 	poetry run ruff check .
+
+shell:
+	poetry run python main.py shell

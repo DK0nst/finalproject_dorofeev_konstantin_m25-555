@@ -5,5 +5,40 @@
     "hashed_password": "ba6312ef1af088b3c2b05464491a8a2d5bd49a452e255fdf9a8f0f0483996bc1",
     "salt": "18430af8232eeb2aa9dbd8416a0d9903",
     "registration_date": "2026-01-14T20:56:22.566199"
+  },
+  {
+    "user_id": 2,
+    "username": "me",
+    "hashed_password": "959f63f040f618978f9212ffedd871e4aa02db3d4709523934b9229df1bd630f",
+    "salt": "8ef7138816f13db3a6e447d46c06b609",
+    "registration_date": "2026-01-14T21:48:17.596602"
+  },
+  {
+    "user_id": 3,
+    "username": "me2",
+    "hashed_password": "64c7b9ea2bf4aff1efd879aea49a52d9a8af7d01844692ae023fdbdd6c853d4b",
+    "salt": "77d076809e8515998c2d7633fdae2002",
+    "registration_date": "2026-01-14T21:50:03.476342"
+  },
+  {
+    "user_id": 4,
+    "username": "alice",
+    "hashed_password": "7435a6f4fc3d4ccb5c4e01f77039c2801e8efb8bcd8adfd572c20bd5de0d51a8",
+    "salt": "e1510cac06aa849810fe6510b0b85eeb",
+    "registration_date": "2026-01-14T22:00:01.493221"
+  },
+  {
+    "user_id": 5,
+    "username": "alice2",
+    "hashed_password": "3b3b3436fbd53cae8cf4a521f981d32e8b39297a50440b68ac0de68e630820bf",
+    "salt": "8c2f7007c1a4170a6b398236c35a5214",
+    "registration_date": "2026-01-14T22:08:01.323218"
+  },
+  {
+    "user_id": 6,
+    "username": "me3",
+    "hashed_password": "9fc3812e3fc84c82c5dcd750fe72c4516e21d5c86afd9824cf495899105837cc",
+    "salt": "c609070ecbbb9961b9dfb34cb032eedb",
+    "registration_date": "2026-01-14T22:19:26.344192"
   }
 ]

@@ -15,6 +15,45 @@ class User:
         self._hashed_password = self._hash_password(password, self._salt)
         self._registration_date = datetime.now()
     
+    @property
+    def user_id(self) -> int:
+        """Геттер для ID пользователя"""
+        return self._user_id
+    
+    @user_id.setter
+    def user_id(self, value: int):
+        """Сеттер для ID пользователя"""
+        if not isinstance(value, int) or value <= 0:
+            raise ValueError("ID пользователя должен быть положительным целым числом")
+        self._user_id = value
+    
+    @property
+    def username(self) -> str:
+        """Геттер для имени пользователя"""
+        return self._username
+    
+    @username.setter
+    def username(self, value: str):
+        """Сеттер для имени пользователя"""
+        if not value or not isinstance(value, str):
+            raise ValueError("Имя пользователя не может быть пустым")
+        self._username = value
+    
+    @property
+    def hashed_password(self) -> str:
+        """Геттер для хешированного пароля"""
+        return self._hashed_password
+    
+    @property
+    def salt(self) -> str:
+        """Геттер для соли"""
+        return self._salt
+    
+    @property
+    def registration_date(self) -> datetime:
+        """Геттер для даты регистрации"""
+        return self._registration_date
+    
     def _hash_password(self, password: str, salt: str) -> str:
         return hashlib.sha256(f"{password}{salt}".encode()).hexdigest()
     
@@ -44,12 +83,19 @@ class User:
     
     @classmethod
     def from_dict(cls, data: Dict):
-        return cls(
+        """Создание пользователя из данных (при логине)"""
+        user = cls(
             user_id=data["user_id"],
             username=data["username"],
-            password="",
-            salt=data["salt"]
+            password=""  # Пустой пароль, но это временно
         )
+        
+        # ПЕРЕЗАПИСЫВАЕМ вычисленные значения на сохранённые
+        user._salt = data["salt"]
+        user._hashed_password = data["hashed_password"]
+        user._registration_date = datetime.fromisoformat(data["registration_date"])
+        
+        return user
 
 
 class Wallet:
@@ -57,17 +103,24 @@ class Wallet:
         if not validate_currency_code(currency_code):
             raise ValueError(f"Неизвестная валюта: {currency_code}")
         
-        self.currency_code = currency_code.upper()
+        self._currency_code = currency_code.upper()
         self._balance = float(balance)
         if self._balance < 0:
             raise ValueError("Баланс не может быть отрицательным")
     
     @property
+    def currency_code(self) -> str:
+        """Геттер для кода валюты"""
+        return self._currency_code
+    
+    @property
     def balance(self) -> float:
+        """Геттер для баланса"""
         return self._balance
     
     @balance.setter
     def balance(self, value: float):
+        """Сеттер для баланса с валидацией"""
         value = float(value)
         if value < 0:
             raise ValueError("Баланс не может быть отрицательным")
@@ -89,7 +142,7 @@ class Wallet:
     
     def to_dict(self) -> Dict:
         return {
-            "currency_code": self.currency_code,
+            "currency_code": self._currency_code,
             "balance": self._balance
         }
     
@@ -103,19 +156,29 @@ class Wallet:
 
 class Portfolio:
     def __init__(self, user_id: int):
-        self.user_id = user_id
-        self.wallets = {}
+        self._user_id = user_id
+        self._wallets = {}
+    
+    @property
+    def user_id(self) -> int:
+        """Геттер для ID пользователя"""
+        return self._user_id
+    
+    @property
+    def wallets(self) -> Dict[str, Wallet]:
+        """Геттер для словаря кошельков (возвращает копию)"""
+        return self._wallets.copy()
     
     def add_currency(self, currency_code: str):
         currency_code = currency_code.upper()
         if not validate_currency_code(currency_code):
             raise ValueError(f"Неизвестная валюта: {currency_code}")
         
-        if currency_code not in self.wallets:
-            self.wallets[currency_code] = Wallet(currency_code)
+        if currency_code not in self._wallets:
+            self._wallets[currency_code] = Wallet(currency_code)
     
     def get_wallet(self, currency_code: str) -> Optional[Wallet]:
-        return self.wallets.get(currency_code.upper())
+        return self._wallets.get(currency_code.upper())
     
     def get_total_value(self, base_currency: str = 'USD') -> float:
         from ..infra.database import db
@@ -125,7 +188,7 @@ class Portfolio:
         pairs = rates.get("pairs", {})
         
         total = 0.0
-        for wallet in self.wallets.values():
+        for wallet in self._wallets.values():
             if wallet.currency_code == base_currency:
                 total += wallet.balance
             else:
@@ -139,10 +202,10 @@ class Portfolio:
     
     def to_dict(self) -> Dict:
         return {
-            "user_id": self.user_id,
+            "user_id": self._user_id,
             "wallets": {
                 code: wallet.to_dict() 
-                for code, wallet in self.wallets.items()
+                for code, wallet in self._wallets.items()
             }
         }
     
@@ -150,5 +213,5 @@ class Portfolio:
     def from_dict(cls, data: Dict):
         portfolio = cls(data["user_id"])
         for code, wallet_data in data["wallets"].items():
-            portfolio.wallets[code] = Wallet.from_dict(wallet_data)
+            portfolio._wallets[code] = Wallet.from_dict(wallet_data)
         return portfolio

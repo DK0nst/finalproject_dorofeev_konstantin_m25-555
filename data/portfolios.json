@@ -2,5 +2,25 @@
   {
     "user_id": 1,
     "wallets": {}
+  },
+  {
+    "user_id": 2,
+    "wallets": {}
+  },
+  {
+    "user_id": 3,
+    "wallets": {}
+  },
+  {
+    "user_id": 4,
+    "wallets": {}
+  },
+  {
+    "user_id": 5,
+    "wallets": {}
+  },
+  {
+    "user_id": 6,
+    "wallets": {}
   }
 ]
