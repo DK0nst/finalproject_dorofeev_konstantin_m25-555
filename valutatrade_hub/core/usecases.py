@@ -69,6 +69,38 @@ class PortfolioManager:
         
         return None
     
+    
+    @staticmethod
+    @log_action("DEPOSIT")
+    def deposit_currency(user_id: int, currency_code: str, 
+                         amount: float) -> Tuple[bool, str]:
+        if amount <= 0:
+            return False, "Сумма должна быть положительной"
+        
+        if not validate_currency_code(currency_code):
+            return False, f"Неизвестная валюта: {currency_code}"
+        
+        portfolio = PortfolioManager.get_user_portfolio(user_id)
+        if not portfolio:
+            return False, "Портфель не найден"
+        
+        try:
+            # Получаем или создаем кошелек
+            wallet = portfolio.get_wallet(currency_code)
+            if not wallet:
+                portfolio.add_currency(currency_code)
+                wallet = portfolio.get_wallet(currency_code)
+            
+            # Пополняем баланс
+            wallet.deposit(amount)
+            PortfolioManager.update_portfolio(portfolio)
+            
+            return True, f"Пополнено {amount:.2f} {currency_code}. " \
+                         f"Баланс: {wallet.balance:.2f} {currency_code}"
+            
+        except ValutaTradeException as e:
+            return False, str(e)
+        
     @staticmethod
     def update_portfolio(portfolio: Portfolio):
         portfolios = db.read_json("portfolios.json")

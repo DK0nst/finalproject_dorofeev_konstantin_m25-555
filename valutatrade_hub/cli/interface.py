@@ -129,6 +129,29 @@ def _buy_command(args_list):
     except Exception as e:
         print(f"Ошибка: {str(e)}")
 
+def _deposit_command(args_list):
+    """Команда пополнения баланса"""
+    if not Session.is_logged_in():
+        print("Сначала выполните login")
+        return
+    
+    parser = argparse.ArgumentParser(prog="deposit", add_help=False)
+    parser.add_argument("--currency", required=True, 
+                        help="Код валюты (например, USD)")
+    parser.add_argument("--amount", type=float, required=True, 
+                        help="Сумма пополнения")
+    
+    try:
+        args = parser.parse_args(args_list)
+        
+        user = Session.current_user
+        success, message = PortfolioManager.deposit_currency(
+            user.user_id, args.currency.upper(), args.amount)
+        print(message)
+    except SystemExit:
+        pass
+    except Exception as e:
+        print(f"Ошибка: {str(e)}")
 
 def _sell_command(args_list):
     """Команда продажи валюты"""
@@ -258,6 +281,11 @@ class ValutaTradeShell(cmd.Cmd):
     def emptyline(self):
         """При пустой строке ничего не делаем"""
         pass
+
+    def do_deposit(self, args):
+        """Пополнить баланс: deposit --currency CODE --amount AMOUNT"""
+        _deposit_command(shlex.split(args))
+        return False
     
     def do_register(self, args):
         """Регистрация нового пользователя: register --username NAME --password PASS"""
@@ -346,6 +374,7 @@ class ValutaTradeShell(cmd.Cmd):
         print("  whoami                                   - Текущий пользователь")
         
         print("\n💰 Торговля:")
+        print("  deposit --currency CODE --amount AMOUNT  - Пополнить баланс")
         print("  buy --currency CODE --amount AMOUNT      - Купить валюту")
         print("  sell --currency CODE --amount AMOUNT     - Продать валюту")
         print("  portfolio [--base CURRENCY]             - Показать портфель")
@@ -364,6 +393,8 @@ class ValutaTradeShell(cmd.Cmd):
         print("\nПримеры:")
         print("  register --username alice --password 123456")
         print("  login --username alice --password 123456")
+        print("  deposit --currency USD --amount 10000")
+        print("  update                                  # Получить курсы")
         print("  buy --currency BTC --amount 0.01")
         print("  rate --from USD --to BTC")
         print("="*60)
