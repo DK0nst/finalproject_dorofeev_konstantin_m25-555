@@ -22,7 +22,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-valutatrade = "valutatrade_hub.cli.interface:main"
+project = "valutatrade_hub.cli.interface:main"
 
 
 [tool.poetry.group.dev.dependencies]
