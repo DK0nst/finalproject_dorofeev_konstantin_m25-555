@@ -10,13 +10,23 @@ class DatabaseManager:
         return cls._instance
     
     def read_json(self, filename: str):
-        """Чтение JSON файла"""
+        """Чтение JSON файла с обработкой ошибок"""
         filepath = Path("data") / filename
+        
+        # Если файла нет, возвращаем значение по умолчанию
         if not filepath.exists():
             return [] if filename.endswith(".json") else {}
         
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+                if not content:  # Если файл пустой
+                    return [] if filename.endswith(".json") else {}
+                return json.loads(content)
+        except (json.JSONDecodeError, ValueError) as e:
+            # Если JSON некорректен, возвращаем значение по умолчанию
+            print(f"Внимание: Ошибка чтения {filename}. Файл будет перезаписан.")
+            return [] if filename.endswith(".json") else {}
     
     def write_json(self, filename: str, data):
         """Запись в JSON файл"""
@@ -24,7 +34,7 @@ class DatabaseManager:
         filepath.parent.mkdir(exist_ok=True)
         
         with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, default=str)
+            json.dump(data, f, indent=2, default=str, ensure_ascii=False)
 
 # Глобальный экземпляр
 db = DatabaseManager()
