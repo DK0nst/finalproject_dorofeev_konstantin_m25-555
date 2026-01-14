@@ -2,10 +2,9 @@ import argparse
 import sys
 from ..core.usecases import UserManager, PortfolioManager, RateManager
 from ..parser_service.updater import RatesUpdater
-from ..parser_service.storage import DataStorage
-from ..parser_service.scheduler import UpdateScheduler
 from ..core.currencies import CURRENCIES
-from ..core.exceptions import ValutaTradeException
+from ..core.exceptions import ValutaTradeException, RegistrationError
+
 
 class Session:
     current_user = None
@@ -24,9 +23,14 @@ class Session:
 
 
 def register_command(args):
-    success, message, _ = UserManager.register_user(args.username, args.password)
-    print(message)
-    return success
+    """Команда регистрации"""
+    try:
+        user_id = UserManager.register_user(args.username, args.password)
+        print(f"Пользователь '{args.username}' зарегистрирован (id={user_id})")
+        return True
+    except RegistrationError as e:
+        print(str(e))
+        return False
 
 
 def login_command(args):
@@ -69,10 +73,14 @@ def buy_command(args):
         print("Сначала выполните login")
         return False
     
-    user = Session.current_user
-    success, message = PortfolioManager.buy_currency(user.user_id, args.currency.upper(), args.amount)
-    print(message)
-    return success
+    try:
+        user = Session.current_user
+        success, message = PortfolioManager.buy_currency(user.user_id, args.currency.upper(), args.amount)
+        print(message)
+        return success
+    except ValutaTradeException as e:
+        print(f"Ошибка: {str(e)}")
+        return False
 
 
 def sell_command(args):
@@ -129,6 +137,15 @@ def show_rates_command(args):
     return True
 
 
+def list_currencies_command(args):
+    """Показать список доступных валют"""
+    print("\nДоступные валюты:")
+    print("-" * 30)
+    for code, info in CURRENCIES.items():
+        print(f"{code}: {info['name']} ({info['type']})")
+    return True
+
+
 def create_parser():
     parser = argparse.ArgumentParser(description="ValutaTrade Hub - Платформа для торговли валютами")
     subparsers = parser.add_subparsers(dest="command", help="Доступные команды")
@@ -170,6 +187,9 @@ def create_parser():
     show_rates_parser = subparsers.add_parser("show-rates", help="Показать курсы из кеша")
     show_rates_parser.add_argument("--currency", help="Показать только указанную валюту")
     
+    # Команда list-currencies
+    list_parser = subparsers.add_parser("list-currencies", help="Показать список доступных валют")
+    
     return parser
 
 
@@ -192,6 +212,7 @@ def main():
         "get-rate": get_rate_command,
         "update-rates": update_rates_command,
         "show-rates": show_rates_command,
+        "list-currencies": list_currencies_command,
     }
     
     if args.command in commands:
@@ -200,29 +221,6 @@ def main():
     else:
         parser.print_help()
 
-
-def buy_command(args):
-    """Команда покупки валюты"""
-    if not Session.is_logged_in():
-        print("Сначала выполните login")
-        return False
-    
-    try:
-        user = Session.current_user
-        success, message = PortfolioManager.buy_currency(user.user_id, args.currency.upper(), args.amount)
-        print(message)
-        return success
-    except ValutaTradeException as e:
-        print(f"Ошибка: {str(e)}")
-        return False
-    
-def list_currencies_command(args):
-    """Показать список доступных валют"""
-    print("\nДоступные валюты:")
-    print("-" * 30)
-    for code, info in CURRENCIES.items():
-        print(f"{code}: {info['name']} ({info['type']})")
-    return True
 
 if __name__ == "__main__":
     main()

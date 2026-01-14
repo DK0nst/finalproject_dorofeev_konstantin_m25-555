@@ -4,7 +4,8 @@ from datetime import datetime
 from .models import User, Portfolio, Wallet
 from .exceptions import (
     InsufficientFundsError, CurrencyNotFoundError, 
-    ApiRequestError, ValutaTradeException
+    ApiRequestError, ValutaTradeException,
+    RegistrationError, LoginError
 )
 from .currencies import validate_currency_code
 from ..decorators import log_action
@@ -22,14 +23,14 @@ def get_next_user_id() -> int:
 class UserManager:
     @staticmethod
     @log_action("REGISTER")
-    def register_user(username: str, password: str) -> Tuple[bool, str, Optional[int]]:
+    def register_user(username: str, password: str) -> int:  # Возвращает только user_id при успехе
         users = db.read_json("users.json")
         
         if any(user["username"] == username for user in users):
-            return False, f"Имя пользователя '{username}' уже занято", None
+            raise RegistrationError(f"Имя пользователя '{username}' уже занято")
         
         if len(password) < 4:
-            return False, "Пароль должен быть не короче 4 символов", None
+            raise RegistrationError("Пароль должен быть не короче 4 символов")
         
         user_id = get_next_user_id()
         user = User(user_id, username, password)
@@ -42,7 +43,7 @@ class UserManager:
         portfolios.append(portfolio.to_dict())
         db.write_json("portfolios.json", portfolios)
         
-        return True, f"Пользователь '{username}' зарегистрирован (id={user_id})", user_id
+        return user_id
     
     @staticmethod
     @log_action("LOGIN")

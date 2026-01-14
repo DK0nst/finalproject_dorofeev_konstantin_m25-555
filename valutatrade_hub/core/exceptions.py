@@ -13,3 +13,11 @@ class CurrencyNotFoundError(ValutaTradeException):
 class ApiRequestError(ValutaTradeException):
     """Ошибка API"""
     pass
+
+class RegistrationError(ValutaTradeException):
+    """Ошибка регистрации"""
+    pass
+
+class LoginError(ValutaTradeException):
+    """Ошибка входа"""
+    pass
