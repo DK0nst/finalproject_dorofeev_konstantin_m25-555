@@ -1,5 +1,6 @@
 import functools
-from typing import Callable, Any, Tuple
+from typing import Any, Callable
+
 from .logging_config import logger
 
 
@@ -17,9 +18,11 @@ def log_action(action_name: str):
                 if isinstance(result, tuple) and len(result) >= 2:
                     success, message = result[0], result[1]
                     if success:
-                        logger.info(f"Действие {action_name} успешно: {message}")
+                        logger.info(
+                            f"Действие {action_name} успешно: {message}")
                     else:
-                        logger.warning(f"Действие {action_name} завершилось с ошибкой: {message}")
+                        logger.warning(
+                            f"Действие {action_name} завершилось с ошибкой: {message}")
                 elif result is None or (isinstance(result, bool) and not result):
                     logger.warning(f"Действие {action_name} завершилось неудачно")
                 else:
@@ -28,7 +31,8 @@ def log_action(action_name: str):
                 return result
                 
             except Exception as e:
-                logger.error(f"Действие {action_name} завершилось с исключением: {str(e)}")
+                logger.error(
+                    f"Действие {action_name} завершилось с исключением: {str(e)}")
                 raise
         
         return wrapper

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+
 class DatabaseManager:
     _instance = None
     
@@ -23,7 +24,7 @@ class DatabaseManager:
                 if not content:  # Если файл пустой
                     return [] if filename.endswith(".json") else {}
                 return json.loads(content)
-        except (json.JSONDecodeError, ValueError) as e:
+        except (json.JSONDecodeError, ValueError):
             # Если JSON некорректен, возвращаем значение по умолчанию
             print(f"Внимание: Ошибка чтения {filename}. Файл будет перезаписан.")
             return [] if filename.endswith(".json") else {}

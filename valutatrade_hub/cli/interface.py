@@ -1,9 +1,10 @@
 import argparse
 import sys
-from ..core.usecases import UserManager, PortfolioManager, RateManager
-from ..parser_service.updater import RatesUpdater
+
 from ..core.currencies import CURRENCIES
-from ..core.exceptions import ValutaTradeException, RegistrationError
+from ..core.exceptions import RegistrationError, ValutaTradeException
+from ..core.usecases import PortfolioManager, RateManager, UserManager
+from ..parser_service.updater import RatesUpdater
 
 
 class Session:
@@ -75,7 +76,8 @@ def buy_command(args):
     
     try:
         user = Session.current_user
-        success, message = PortfolioManager.buy_currency(user.user_id, args.currency.upper(), args.amount)
+        success, message = PortfolioManager.buy_currency(
+            user.user_id, args.currency.upper(), args.amount)
         print(message)
         return success
     except ValutaTradeException as e:
@@ -89,13 +91,15 @@ def sell_command(args):
         return False
     
     user = Session.current_user
-    success, message = PortfolioManager.sell_currency(user.user_id, args.currency.upper(), args.amount)
+    success, message = PortfolioManager.sell_currency(
+        user.user_id, args.currency.upper(), args.amount)
     print(message)
     return success
 
 
 def get_rate_command(args):
-    success, message, _ = RateManager.get_rate(args.from_currency.upper(), args.to_currency.upper())
+    success, message, _ = RateManager.get_rate(
+        args.from_currency.upper(), args.to_currency.upper())
     print(message)
     return success
 
@@ -119,7 +123,8 @@ def show_rates_command(args):
     rates_file = Path("data/rates.json")
     
     if not rates_file.exists():
-        print("Локальный кеш курсов пуст. Выполните 'update-rates', чтобы загрузить данные.")
+        print("Локальный кеш курсов пуст. " \
+        "Выполните 'update-rates', чтобы загрузить данные.")
         return False
     
     with open(rates_file, 'r', encoding='utf-8') as f:
@@ -147,27 +152,39 @@ def list_currencies_command(args):
 
 
 def create_parser():
-    parser = argparse.ArgumentParser(description="ValutaTrade Hub - Платформа для торговли валютами")
-    subparsers = parser.add_subparsers(dest="command", help="Доступные команды")
+    parser = argparse.ArgumentParser(
+        description="ValutaTrade Hub - Платформа для торговли валютами")
+    subparsers = parser.add_subparsers(dest="command", 
+                                       help="Доступные команды")
     
     # Команда register
-    register_parser = subparsers.add_parser("register", help="Регистрация нового пользователя")
-    register_parser.add_argument("--username", required=True, help="Имя пользователя")
-    register_parser.add_argument("--password", required=True, help="Пароль")
+    register_parser = subparsers.add_parser(
+        "register", help="Регистрация нового пользователя")
+    register_parser.add_argument("--username", required=True, 
+                                 help="Имя пользователя")
+    register_parser.add_argument("--password", required=True, 
+                                 help="Пароль")
     
     # Команда login
-    login_parser = subparsers.add_parser("login", help="Вход в систему")
-    login_parser.add_argument("--username", required=True, help="Имя пользователя")
-    login_parser.add_argument("--password", required=True, help="Пароль")
+    login_parser = subparsers.add_parser("login", 
+                                         help="Вход в систему")
+    login_parser.add_argument("--username", required=True, 
+                              help="Имя пользователя")
+    login_parser.add_argument("--password", required=True, 
+                              help="Пароль")
     
     # Команда show-portfolio
-    portfolio_parser = subparsers.add_parser("show-portfolio", help="Показать портфель")
-    portfolio_parser.add_argument("--base", help="Базовая валюта (по умолчанию: USD)")
+    portfolio_parser = subparsers.add_parser("show-portfolio", 
+                                             help="Показать портфель")
+    portfolio_parser.add_argument("--base", 
+                                  help="Базовая валюта (по умолчанию: USD)")
     
     # Команда buy
     buy_parser = subparsers.add_parser("buy", help="Купить валюту")
-    buy_parser.add_argument("--currency", required=True, help="Код валюты (например, BTC)")
-    buy_parser.add_argument("--amount", type=float, required=True, help="Количество")
+    buy_parser.add_argument("--currency", required=True, 
+                            help="Код валюты (например, BTC)")
+    buy_parser.add_argument("--amount", type=float, required=True, 
+                            help="Количество")
     
     # Команда sell
     sell_parser = subparsers.add_parser("sell", help="Продать валюту")
@@ -176,20 +193,28 @@ def create_parser():
     
     # Команда get-rate
     rate_parser = subparsers.add_parser("get-rate", help="Получить курс валюты")
-    rate_parser.add_argument("--from", dest="from_currency", required=True, help="Исходная валюта")
-    rate_parser.add_argument("--to", dest="to_currency", required=True, help="Целевая валюта")
+    rate_parser.add_argument("--from", dest="from_currency", 
+                             required=True, help="Исходная валюта")
+    rate_parser.add_argument("--to", dest="to_currency", 
+                             required=True, help="Целевая валюта")
     
     # Команда update-rates
     update_parser = subparsers.add_parser("update-rates", help="Обновить курсы из API")
-    update_parser.add_argument("--source", choices=["coingecko", "exchangerate"], help="Источник данных")
+    update_parser.add_argument("--source", 
+                               choices=["coingecko", "exchangerate"], 
+                               help="Источник данных")
     
     # Команда show-rates
-    show_rates_parser = subparsers.add_parser("show-rates", help="Показать курсы из кеша")
-    show_rates_parser.add_argument("--currency", help="Показать только указанную валюту")
+    show_rates_parser = subparsers.add_parser("show-rates", 
+                                              help="Показать курсы из кеша")
+    show_rates_parser.add_argument("--currency", 
+                                   help="Показать только указанную валюту")
     
-    # Команда list-currencies
-    list_parser = subparsers.add_parser("list-currencies", help="Показать список доступных валют")
-    
+    # # Команда list-currencies
+    # list_parser = subparsers.add_parser("list-currencies", 
+    # help="Показать список доступных валют")
+    # list_parser.set_defaults(func=list_currencies_command)  # если функция существует
+
     return parser
 
 

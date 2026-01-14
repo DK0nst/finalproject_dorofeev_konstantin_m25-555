@@ -1,5 +1,7 @@
-import requests
 from datetime import datetime
+
+import requests
+
 from . import config
 
 
@@ -29,7 +31,7 @@ class CoinGeckoClient:
             
             return rates
             
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             return {}
 
 
@@ -62,5 +64,5 @@ class ExchangeRateApiClient:
             
             return rates
             
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             return {}

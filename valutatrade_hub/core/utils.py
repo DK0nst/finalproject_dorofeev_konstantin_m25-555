@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 def format_amount(amount: float, currency: str) -> str:
     """Форматирование суммы в зависимости от валюты"""
     if currency in ["BTC", "ETH", "SOL"]:
@@ -14,5 +15,5 @@ def is_rate_fresh(updated_at: str) -> bool:
         update_time = datetime.fromisoformat(updated_at.replace('Z', '+00:00'))
         age = (datetime.now() - update_time).total_seconds()
         return age < settings.RATES_TTL
-    except:
+    except (ValueError, TypeError):
         return False

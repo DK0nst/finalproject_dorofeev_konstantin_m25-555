@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
+
 from . import config
 from .api_clients import CoinGeckoClient, ExchangeRateApiClient
 

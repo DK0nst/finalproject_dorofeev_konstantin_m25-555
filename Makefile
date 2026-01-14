@@ -1,5 +1,5 @@
 install:
-	pip install -e .
+	poetry install
 
 project:
 	poetry run project

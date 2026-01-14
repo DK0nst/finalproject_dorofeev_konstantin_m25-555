@@ -1,15 +1,13 @@
 from typing import Optional, Tuple
-from datetime import datetime
 
-from .models import User, Portfolio, Wallet
-from .exceptions import (
-    InsufficientFundsError, CurrencyNotFoundError, 
-    ApiRequestError, ValutaTradeException,
-    RegistrationError, LoginError
-)
-from .currencies import validate_currency_code
 from ..decorators import log_action
 from ..infra.database import db
+from .currencies import validate_currency_code
+from .exceptions import (
+    RegistrationError,
+    ValutaTradeException,
+)
+from .models import Portfolio, User
 
 
 def get_next_user_id() -> int:
@@ -23,7 +21,8 @@ def get_next_user_id() -> int:
 class UserManager:
     @staticmethod
     @log_action("REGISTER")
-    def register_user(username: str, password: str) -> int:  # Возвращает только user_id при успехе
+    # Возвращает только user_id при успехе
+    def register_user(username: str, password: str) -> int:  
         users = db.read_json("users.json")
         
         if any(user["username"] == username for user in users):
@@ -85,7 +84,8 @@ class PortfolioManager:
     
     @staticmethod
     @log_action("BUY")
-    def buy_currency(user_id: int, currency_code: str, amount: float) -> Tuple[bool, str]:
+    def buy_currency(user_id: int, currency_code: str, 
+                     amount: float) -> Tuple[bool, str]:
         if amount <= 0:
             return False, "Количество должно быть положительным числом"
         
@@ -131,7 +131,8 @@ class PortfolioManager:
     
     @staticmethod
     @log_action("SELL")
-    def sell_currency(user_id: int, currency_code: str, amount: float) -> Tuple[bool, str]:
+    def sell_currency(user_id: int, currency_code: str, 
+                      amount: float) -> Tuple[bool, str]:
         if amount <= 0:
             return False, "Количество должно быть положительным числом"
         
@@ -149,7 +150,9 @@ class PortfolioManager:
         try:
             # Проверяем баланс
             if target_wallet.balance < amount:
-                return False, f"Недостаточно {currency_code}. Доступно: {target_wallet.balance:.4f}"
+                message = f"Недостаточно {currency_code}." 
+                message = message + f" Доступно: {target_wallet.balance:.4f}"
+                return False, message
             
             # Получаем курс
             rates = db.read_json("rates.json")
@@ -172,8 +175,9 @@ class PortfolioManager:
             
             usd_wallet.deposit(revenue_usd)
             PortfolioManager.update_portfolio(portfolio)
-            
-            return True, f"Продано {amount:.4f} {currency_code} за {revenue_usd:.2f} USD"
+            message = f"Продано {amount:.4f} {currency_code}" 
+            message = message + f" за {revenue_usd:.2f} USD"
+            return True, message
             
         except ValutaTradeException as e:
             return False, str(e)
@@ -182,12 +186,14 @@ class PortfolioManager:
 class RateManager:
     @staticmethod
     @log_action("GET_RATE")
-    def get_rate(from_currency: str, to_currency: str) -> Tuple[bool, str, Optional[float]]:
+    def get_rate(from_currency: str, 
+                 to_currency: str) -> Tuple[bool, str, Optional[float]]:
         if not from_currency or not to_currency:
             return False, "Коды валют не могут быть пустыми", None
         
-        if not validate_currency_code(from_currency) or not validate_currency_code(to_currency):
-            return False, f"Неизвестная валюта", None
+        if not validate_currency_code(from_currency) or \
+            not validate_currency_code(to_currency):
+            return False, "Неизвестная валюта", None
         
         rates = db.read_json("rates.json")
         pairs = rates.get("pairs", {})
@@ -196,7 +202,9 @@ class RateManager:
         pair_key = f"{from_currency}_{to_currency}"
         if pair_key in pairs:
             rate_info = pairs[pair_key]
-            return True, f"Курс {from_currency}→{to_currency}: {rate_info['rate']:.6f}", rate_info['rate']
+            message = f"Курс {from_currency}→{to_currency}:" 
+            message = message + f" {rate_info['rate']:.6f}"
+            return True, message, rate_info['rate']
         
         # Обратный курс
         reverse_key = f"{to_currency}_{from_currency}"

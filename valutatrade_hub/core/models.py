@@ -1,11 +1,10 @@
 import hashlib
+import os
 from datetime import datetime
 from typing import Dict, Optional
-import os
 
-from .exceptions import InsufficientFundsError
 from .currencies import validate_currency_code
-from ..decorators import log_action
+from .exceptions import InsufficientFundsError
 
 
 class User:

@@ -1,5 +1,7 @@
 import time
+
 from .updater import RatesUpdater
+
 
 class UpdateScheduler:
     def __init__(self, interval_minutes: int = 5):
