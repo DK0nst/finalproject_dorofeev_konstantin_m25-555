@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from .exceptions import CurrencyNotFoundError
 
 
@@ -9,7 +10,8 @@ class Currency(ABC):
         if not name or not isinstance(name, str):
             raise ValueError("Название валюты не может быть пустым")
         if not (2 <= len(code) <= 5) or not code.isupper() or ' ' in code:
-            raise ValueError("Код валюты должен быть в верхнем регистре, 2-5 символов, без пробелов")
+            raise ValueError(
+                "Код валюты должен быть в верхнем регистре, 2-5 символов, без пробелов")
         self._name = name
         self._code = code
     
@@ -39,7 +41,9 @@ class FiatCurrency(Currency):
         return self._issuing_country
     
     def get_display_info(self) -> str:
-        return f"[FIAT] {self._code} --- {self._name} (Issuing: {self._issuing_country})"
+        message = f"[FIAT] {self._code} --- {self._name}" 
+        message = message + f" (Issuing: {self._issuing_country})"
+        return message
 
 
 class CryptoCurrency(Currency):
@@ -59,7 +63,9 @@ class CryptoCurrency(Currency):
         return self._market_cap
     
     def get_display_info(self) -> str:
-        return f"[CRYPTO] {self._code} --- {self._name} (Algo: {self._algorithm}, MCAP: {self._market_cap:.2e})"
+        message = f"[CRYPTO] {self._code} --- {self._name}" 
+        message = message + f" (Algo: {self._algorithm}, MCAP: {self._market_cap:.2e})"
+        return message
 
 
 # Реестр валют

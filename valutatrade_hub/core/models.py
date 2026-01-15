@@ -3,7 +3,9 @@ import os
 from datetime import datetime
 from typing import Dict, Optional
 
-from .currencies import get_currency  # ИЗМЕНЕНО: используем get_currency вместо validate_currency_code
+from .currencies import (
+    get_currency,  # ИЗМЕНЕНО: используем get_currency вместо validate_currency_code
+)
 from .exceptions import InsufficientFundsError
 
 
@@ -104,7 +106,7 @@ class Wallet:
         try:
             currency = get_currency(currency_code.upper())  # Получаем объект валюты
             self._currency_code = currency.code
-        except Exception as e:
+        except Exception:
             raise ValueError(f"Неизвестная валюта: {currency_code}")
         
         self._balance = float(balance)
@@ -176,7 +178,7 @@ class Portfolio:
         currency_code = currency_code.upper()
         try:
             get_currency(currency_code)  # ИЗМЕНЕНО: используем get_currency
-        except Exception as e:
+        except Exception:
             raise ValueError(f"Неизвестная валюта: {currency_code}")
         
         if currency_code not in self._wallets:

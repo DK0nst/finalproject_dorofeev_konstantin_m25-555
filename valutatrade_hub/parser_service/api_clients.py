@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+
 import requests
 
-from . import config
 from ..core.exceptions import ApiRequestError
+from . import config
 
 
 class BaseApiClient(ABC):
@@ -57,7 +58,8 @@ class ExchangeRateApiClient(BaseApiClient):
             data = response.json()
             
             if data.get("result") != "success":
-                raise ApiRequestError(f"API вернуло ошибку: {data.get('error-type', 'unknown')}")
+                raise ApiRequestError(
+                    f"API вернуло ошибку: {data.get('error-type', 'unknown')}")
             
             rates = {}
             timestamp = data.get("time_last_update_utc", datetime.now().isoformat())

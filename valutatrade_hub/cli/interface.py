@@ -8,6 +8,7 @@ from ..core.exceptions import RegistrationError, ValutaTradeException
 from ..core.usecases import PortfolioManager, RateManager, UserManager
 from ..parser_service.updater import RatesUpdater
 
+
 class Session:
     current_user = None
     
@@ -229,7 +230,8 @@ def _show_rates_command(args_list):
         rates_file = Path("data/rates.json")
         
         if not rates_file.exists():
-            print("Локальный кеш курсов пуст. Выполните 'update', чтобы загрузить данные.")
+            print("Локальный кеш курсов пуст. " \
+            "Выполните 'update', чтобы загрузить данные.")
             return
         
         with open(rates_file, 'r', encoding='utf-8') as f:
