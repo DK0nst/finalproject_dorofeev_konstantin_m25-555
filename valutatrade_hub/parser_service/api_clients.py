@@ -91,7 +91,8 @@ class ExchangeRateApiClient(BaseApiClient):
                         "updated_at": timestamp,
                         "source": self.name
                     }
-                    print(f"DEBUG: Найден курс {pair_key} = {conversion_rates[currency]}")
+                    print(
+                        f"DEBUG: Найден курс {pair_key} = {conversion_rates[currency]}")
             
             print(f"DEBUG: ExchangeRate-API вернул {len(rates)} курсов")
             return rates
