@@ -1,7 +1,7 @@
 import os
 
-# Ключ ExchangeRate-API загружается из переменной окружения
-EXCHANGERATE_API_KEY = os.getenv("EXCHANGERATE_API_KEY", "ваш_ключ_здесь")
+# Ключ ExchangeRate-API (по умолчанию из задания)
+EXCHANGERATE_API_KEY = os.getenv("EXCHANGERATE_API_KEY", "f55b4fd1a8f979f145bdd035")
 
 # URL API
 COINGECKO_URL = "https://api.coingecko.com/api/v3/simple/price"

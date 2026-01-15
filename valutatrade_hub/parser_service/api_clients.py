@@ -1,15 +1,25 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
-
 import requests
 
 from . import config
+from ..core.exceptions import ApiRequestError
 
 
-class CoinGeckoClient:
+class BaseApiClient(ABC):
+    """Абстрактный базовый класс для API клиентов"""
+    
+    @abstractmethod
+    def fetch_rates(self) -> dict:
+        """Получение курсов валют"""
+        pass
+
+
+class CoinGeckoClient(BaseApiClient):
     def __init__(self):
         self.name = "CoinGecko"
     
-    def fetch_rates(self):
+    def fetch_rates(self) -> dict:
         try:
             ids = ",".join(config.CRYPTO_ID_MAP.values())
             url = f"{config.COINGECKO_URL}?ids={ids}&vs_currencies=usd"
@@ -31,15 +41,15 @@ class CoinGeckoClient:
             
             return rates
             
-        except requests.exceptions.RequestException:
-            return {}
+        except requests.exceptions.RequestException as e:
+            raise ApiRequestError(f"Ошибка при обращении к CoinGecko API: {str(e)}")
 
 
-class ExchangeRateApiClient:
+class ExchangeRateApiClient(BaseApiClient):
     def __init__(self):
         self.name = "ExchangeRate-API"
     
-    def fetch_rates(self):
+    def fetch_rates(self) -> dict:
         try:
             url = f"{config.EXCHANGERATE_API_URL}/{config.BASE_CURRENCY}"
             response = requests.get(url, timeout=config.REQUEST_TIMEOUT)
@@ -47,7 +57,7 @@ class ExchangeRateApiClient:
             data = response.json()
             
             if data.get("result") != "success":
-                return {}
+                raise ApiRequestError(f"API вернуло ошибку: {data.get('error-type', 'unknown')}")
             
             rates = {}
             timestamp = data.get("time_last_update_utc", datetime.now().isoformat())
@@ -64,5 +74,5 @@ class ExchangeRateApiClient:
             
             return rates
             
-        except requests.exceptions.RequestException:
-            return {}
+        except requests.exceptions.RequestException as e:
+            raise ApiRequestError(f"Ошибка при обращении к ExchangeRate-API: {str(e)}")

@@ -3,11 +3,10 @@ import cmd
 import shlex
 import sys
 
-from ..core.currencies import CURRENCIES
+from ..core.currencies import get_all_currencies
 from ..core.exceptions import RegistrationError, ValutaTradeException
 from ..core.usecases import PortfolioManager, RateManager, UserManager
 from ..parser_service.updater import RatesUpdater
-
 
 class Session:
     current_user = None
@@ -256,10 +255,11 @@ def _show_rates_command(args_list):
 
 def _list_currencies_command(args_list):
     """Команда списка валют"""
+    currencies = get_all_currencies()
     print("\nДоступные валюты:")
     print("-" * 30)
-    for code, info in CURRENCIES.items():
-        print(f"{code}: {info['name']} ({info['type']})")
+    for code, currency in currencies.items():
+        print(f"{code}: {currency.get_display_info()}")
 
 
 # ============================================================================

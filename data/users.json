@@ -40,5 +40,12 @@
     "hashed_password": "9fc3812e3fc84c82c5dcd750fe72c4516e21d5c86afd9824cf495899105837cc",
     "salt": "c609070ecbbb9961b9dfb34cb032eedb",
     "registration_date": "2026-01-14T22:19:26.344192"
+  },
+  {
+    "user_id": 7,
+    "username": "testuser1",
+    "hashed_password": "766814042208f2cc7e8808bff1dd3ff7a8d59d6c2e7ef2f34c0a520566aaae20",
+    "salt": "31366dafa622d1cf78b9b732fc177bf8",
+    "registration_date": "2026-01-15T21:36:42.303406"
   }
 ]
