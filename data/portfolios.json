@@ -44,5 +44,35 @@
         "balance": 0.1
       }
     }
+  },
+  {
+    "user_id": 8,
+    "wallets": {
+      "USD": {
+        "currency_code": "USD",
+        "balance": 40423.1
+      },
+      "BTC": {
+        "currency_code": "BTC",
+        "balance": 0.1
+      }
+    }
+  },
+  {
+    "user_id": 9,
+    "wallets": {
+      "USD": {
+        "currency_code": "USD",
+        "balance": 451974.97
+      },
+      "BTC": {
+        "currency_code": "BTC",
+        "balance": 0.4
+      },
+      "ETH": {
+        "currency_code": "ETH",
+        "balance": 3.0
+      }
+    }
   }
 ]

@@ -265,3 +265,7 @@ logout
 
 # 16. Выход из программы
 exit
+
+
+!!!!! Демонстрация работы проекта (asciinema) !!!!
+[![asciicast](https://asciinema.org/a/1SQM8Ey1UNxHAucL.svg)](https://asciinema.org/a/1SQM8Ey1UNxHAucL)
